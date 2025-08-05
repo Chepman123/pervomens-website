@@ -1,0 +1,16 @@
+footer{
+    background-color: black;
+    color: white;
+    height: 200px;
+    display: flex;
+    justify-content: end;
+    flex-direction: column;
+}
+footer h3{
+    padding: 20px;
+    padding-bottom: 80px;
+}
+footer p{
+    padding: 20px;
+    opacity: 0.6;
+}
