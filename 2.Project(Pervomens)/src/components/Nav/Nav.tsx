@@ -1,4 +1,3 @@
-import NavButton from '../Buttons/NavButton/NavButton';
 import './Nav.css';
 import logo from '/logo.png';
 

@@ -6,11 +6,11 @@ footer{
     justify-content: end;
     flex-direction: column;
 }
-footer h3{
+.h3{
     padding: 20px;
     padding-bottom: 80px;
 }
-footer p{
+.p{
     padding: 20px;
     opacity: 0.6;
 }

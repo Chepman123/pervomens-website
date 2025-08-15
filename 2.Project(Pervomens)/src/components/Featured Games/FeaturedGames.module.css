@@ -1,39 +1,40 @@
-.FeaturedGames{
+.article{
     display: flex;
     background-color: black;
     width: 100%;
     height: 400px;
     box-shadow: 0px -9px 15px 5px #000000;
 }
-.FeaturedGames img,
-.FeaturedGames > section{
+.img,
+.section{
   color: white;
   width: 50%;
   height: 100%;
   object-fit: contain;
 }
 .borderDiv{
+    display: block;
     background-color: white;
     height: 2px;
     width: 50%;
 }
-.FeaturedGames h1{
+.h1{
     font-size: 2em;
    text-transform: uppercase;
 }
-.FeaturedGames p{
+.p{
     color: white;
     padding-top: 30px;
     opacity: 0.6;
 }
-.FeaturedGames > section{
+.section{
   padding: 70px 40px 40px 40px;
 }
-.FeaturedGames h4{
+.h4{
     padding-top: 2px;
     opacity: 0.6;
 }
-.FeaturedGames button{
+.article button{
     margin-top: 50px;
     
 }
