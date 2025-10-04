@@ -1,0 +1,83 @@
+.article{
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    height: 700px;
+    width: 100%;
+
+    animation: anim 1s ease-in-out forwards;
+    animation-timeline: view();
+    animation-range: entry 0% cover 40%;
+}
+@keyframes anim{
+    to{
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.h1{
+    font-size: 150%;
+    text-transform: uppercase;
+    padding-top: 50px;
+    color: white;
+    text-decoration:underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 6px; 
+    text-transform:uppercase;
+}
+.a{
+    text-decoration:none;
+    transition: ease-in-out 0.2s all;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.7); 
+}
+.a:hover{
+    scale:1.2;
+    animation: shake 1.5s infinite;
+}
+@keyframes shake {
+  0% { transform: translateX(0); }
+  10% { transform: translateX(-3px); }
+  20% { transform: translateX(3px); }
+  30% { transform: translateX(-3px); }
+  40% { transform: translateX(3px); }
+  50% { transform: translateX(-3px); }
+  60% { transform: translateX(3px); }
+  70% { transform: translateX(-3px); }
+  80% { transform: translateX(3px); }
+  90% { transform: translateX(-3px); }
+  100% { transform: translateX(0); }
+}
+.ul{
+    list-style: none;
+    margin-top: 30px;
+    margin-bottom: 50px;
+    width: 95%;
+    height: 80%;
+    overflow-x: auto;
+    gap: 10px; 
+    display: flex;
+    scroll-behavior: smooth; 
+    scroll-behavior: none;
+    padding-bottom: 10px;
+}
+
+.ul::-webkit-scrollbar {
+  height: 10px; 
+  
+}
+.ul::-webkit-scrollbar-track {
+  background: transparent; 
+}
+.ul a{
+    transition: all ease 0.3s;
+}
+.ul:hover a{
+    filter: grayscale(100%); 
+} 
+.ul a:hover{
+    filter: grayscale(0%); 
+    transform: scale(0.9);
+    cursor: pointer;
+    box-shadow: 0px 0px 15px 10px #000000;
+}

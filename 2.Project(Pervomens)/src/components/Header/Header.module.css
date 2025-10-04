@@ -8,12 +8,15 @@ header{
     padding: 0 20px 0 20px ;
     z-index: 1;
 
+    background-color: rgba(0, 0, 0, var(--header-color)); 
+    box-shadow: 0px 4px 15px var(--header-shadow) #000000;
     background-color: null;
 }
-.scrolledHeader{
+.scrolledHeader1{
     background-color: rgba(0, 0, 0, 0.75); 
     box-shadow: 0px 4px 15px -1px #000000;
 }
+
 .div{
     margin-right: 40px;
 }
