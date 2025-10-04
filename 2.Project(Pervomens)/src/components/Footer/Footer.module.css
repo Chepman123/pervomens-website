@@ -24,6 +24,15 @@ footer {
 .span{
     display:flex;
 }
+@media(max-width:765px){
+  footer{
+    text-align: center;
+    height: 400px;
+  }
+  .span{
+    flex-direction: column;
+  }
+}
 .p {
   padding: 20px;
   opacity: 0.6;

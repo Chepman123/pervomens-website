@@ -17,3 +17,9 @@ html{
   background-color: #444; 
   border-radius: 6px;
 }
+@media(max-width:765px){
+  body{
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+}

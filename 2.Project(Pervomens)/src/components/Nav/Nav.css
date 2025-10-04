@@ -34,3 +34,15 @@ nav > p{
 nav .borderDiv{
     width: 31%;
 }
+@media(max-width:765px){
+    nav{
+        height: 500px;
+        text-align: center;
+    }
+    nav>h1{
+        font-size:2em;
+    }
+    nav>img{
+        height: 150px;
+    }
+}

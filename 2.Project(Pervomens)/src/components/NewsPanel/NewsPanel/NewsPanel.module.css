@@ -8,6 +8,12 @@
     align-items: center;
     border-radius: 20px;
 }
+@media(max-width:768px){
+    .a{
+        
+        
+    }
+}
 .img{
     width: 100%;
     object-fit: contain;

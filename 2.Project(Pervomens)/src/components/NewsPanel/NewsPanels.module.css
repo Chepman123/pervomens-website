@@ -81,3 +81,17 @@
     cursor: pointer;
     box-shadow: 0px 0px 15px 10px #000000;
 }
+@media(max-width:765px){
+    .ul a{
+    transition: all ease 0.3s;
+}
+.ul:hover a{
+    filter: grayscale(0); 
+} 
+.ul a:hover{
+    filter: grayscale(0%); 
+    transform: scale(1);
+    cursor: pointer;
+    box-shadow: none;
+}
+}

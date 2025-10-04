@@ -46,3 +46,17 @@
     position: relative;
 
 }
+@media(max-width:765px){
+    .article{
+        height: 700px;
+        flex-direction: column-reverse !important;
+    }
+    .section{
+
+        width: 90%;
+        height: 500px;
+    }
+    .img{
+        width: 100%;
+    }
+}
