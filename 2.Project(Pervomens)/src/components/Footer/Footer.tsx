@@ -7,7 +7,7 @@ export default function Footer() {
       <h1 className={classes.h1}>Contact</h1>
       <span className={classes.span}>
       <p className={classes.p}>
-        gmail: Vladshlapak333@gmail.com
+        email: Vladshlapak333@gmail.com
       </p>
       <p className={classes.p}>
         main author: Vlad Shlapak
