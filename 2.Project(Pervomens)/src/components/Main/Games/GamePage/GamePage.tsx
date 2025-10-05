@@ -5,7 +5,7 @@ import classes from "./GamePage.module.css";
 import type { gameData } from '../../../../data/gameData'
 import { useParams } from "react-router-dom";
 import { data as allGames } from '../../../../data/gameData';
-import ImageFullScreen from "../../../Modal/ImageFullscrene";
+import ImageFullScreen from "../../../Modal/ImageFullScrene";
 
 export default function GamePage(){
      const { urlName } = useParams<{ urlName: string }>();
