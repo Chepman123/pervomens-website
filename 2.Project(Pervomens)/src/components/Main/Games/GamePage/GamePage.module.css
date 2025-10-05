@@ -66,16 +66,18 @@
     gap: 10px;
     align-items: center;
     padding-top: 25px;
-    padding-bottom: 25px;
-
+    margin-bottom: 50px;
     width: 90%;
     justify-self: center;
     height: 300px;
-    scrollbar-width: none;
+    
+}
+.screenshot:hover{
+    cursor: zoom-in;
 }
 .screenshots::-webkit-scrollbar {
   height: 10px;
-  display: none;
+
 }
 .screenshots::-webkit-scrollbar-track {
   background: transparent;
@@ -86,6 +88,7 @@
 }
 .screenshot{
     height: 200px;
+    border-radius: 15px;
 }
 
 .article{

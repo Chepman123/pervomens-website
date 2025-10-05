@@ -1,8 +1,16 @@
 .div{
-    padding: 100px;
+    padding-top: 20px;
     gap: 15px;
     display: flex;
     flex-wrap: wrap;
+    border: none;
     justify-content: center;
     background-color: rgb(12, 12, 12);
+    border-top: 1px white solid;
+}
+.h1{
+    padding-top: 100px;
+    padding-bottom: 20px;
+    justify-self: center;
+    color: white;
 }

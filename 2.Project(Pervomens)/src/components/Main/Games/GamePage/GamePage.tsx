@@ -5,6 +5,7 @@ import classes from "./GamePage.module.css";
 import type { gameData } from '../../../../data/gameData'
 import { useParams } from "react-router-dom";
 import { data as allGames } from '../../../../data/gameData';
+import ImageFullScreen from "../../../Modal/ImageFullscrene";
 
 export default function GamePage(){
      const { urlName } = useParams<{ urlName: string }>();
@@ -39,7 +40,7 @@ export default function GamePage(){
     <div className={classes.mainPart}>
     <section className={classes.screenshots}>
            {data.screenshots.map((screenshot)=>{
-            return(<img className={classes.screenshot} src={'/GameData/'+data.tittle+'/Screenshots/'+screenshot+'.jpg'}/>)
+            return(<ImageFullScreen data={data}screenshot={screenshot}/>)
            })}
         </section>
         <article className={classes.article}>
