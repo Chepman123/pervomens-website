@@ -4,7 +4,7 @@ import classes from './NewsPanel.module.css'
 export default function NewsPanel(){
     return (
         <a className={classes.a}>
-            <img src='/GameData/PanicPlague/Screenshots/1.png' className={classes.img}/>
+            <img src='/GameData/Panic Plague/Screenshots/1.jpg' className={classes.img}/>
             <div className={classes.tags}>
                 <Tag>Game</Tag>
                 <Tag>Panic Plague</Tag>

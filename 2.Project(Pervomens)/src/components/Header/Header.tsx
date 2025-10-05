@@ -15,7 +15,7 @@ export default function Header(){
 
        scrollCount/=2;
 
-        if (scrollCount > 700) scrollCount = 700; 
+        if (scrollCount > 500) scrollCount = 700; 
         const headerBg = Math.min(Math.max(scrollCount * 0.01, 0), 0.75); 
         const headerSb = -20 + (13 / 700) * scrollCount; 
        
@@ -34,9 +34,9 @@ export default function Header(){
     return (
         <header style={style}>
             <div className={classes.div}>
-                <Link to="/"><a href='#'>Home</a></Link>
-                <a href='#games'>Games</a>
-                <a href='#news'>News</a>
+                <Link to="/">Home</Link>
+                <Link to="/Games">Games</Link>
+                <Link to="/News">Home</Link>
                 <a href='#'>Wiki</a>
                 <a href='#contact'>Contact</a>
             </div>

@@ -40,9 +40,12 @@
  .h1{
     text-align: center;
     font-size: 200%;
+    margin: 0;
  }
  .tags{
     flex-direction: column;
+    width: 100%;
+    align-items: center;
     margin: 5px;
     gap: 5px;
  }

@@ -3,7 +3,8 @@ import Footer from './components/Footer/Footer';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import Home from './components/Main/Home/Home';
 import Games from './components/Main/Games/Games';
-
+import GamePage from "./components/Main/Games/GamePage/GamePage"
+import {data} from './data/gameData'
 export default function App() {
   return (
     <>
@@ -11,8 +12,9 @@ export default function App() {
       <BrowserRouter>
       <Header/>
       <Routes>
-        <Route path="/" element={<Home/>}></Route>
-        <Route path="/Games" element={<Games/>}></Route>
+        <Route path="/" element={<Home/>}/>
+        <Route path="/Games" element={<Games/>}/>
+        <Route path='/Games/:urlName' element={<GamePage/>}/>
       </Routes>
        <Footer/>
       </BrowserRouter>

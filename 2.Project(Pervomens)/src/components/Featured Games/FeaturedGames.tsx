@@ -5,7 +5,7 @@ import classes from './FeaturedGames.module.css';
 export default function FeaturedGames({left}:{left:boolean}){
     return(
         <article className={classes.article} style={{flexDirection:left?'row-reverse':'row'}}>
-        <img className={classes.img} src='/GameData/PanicPlague/Screenshots/1.png' alt='game screenshot'/>
+        <img className={classes.img} src='/GameData/Panic Plague/Screenshots/1.jpg' alt='game screenshot'/>
         <section className={classes.section}>
          <div>
             <h1 className={classes.h1}>Panic Plague</h1>

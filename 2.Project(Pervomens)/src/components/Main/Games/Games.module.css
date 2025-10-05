@@ -1,0 +1,8 @@
+.div{
+    padding: 100px;
+    gap: 15px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    background-color: rgb(12, 12, 12);
+}
