@@ -36,7 +36,7 @@ export default function Header(){
             <div className={classes.div}>
                 <Link to="/">Home</Link>
                 <Link to="/Games">Games</Link>
-                <Link to="/News">Home</Link>
+                <Link to="/News">News</Link>
                 <a href='#'>Wiki</a>
                 <a href='#contact'>Contact</a>
             </div>

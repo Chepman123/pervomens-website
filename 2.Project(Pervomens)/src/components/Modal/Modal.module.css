@@ -17,17 +17,22 @@
     object-fit: contain;
     
 }
-@media(max-width:765px){
-    .img{
-        width: 100%;
-    }
-}
+
 .buttons{
     width: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100px;
+}
+@media(max-width:765px){
+    .img{
+        width: 105%;
+        margin-left: -1%;
+    }
+    .buttons{
+        align-items: end;
+    }
 }
 .buttons a{
     background: none;

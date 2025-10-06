@@ -4,6 +4,8 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import Home from './components/Main/Home/Home';
 import Games from './components/Main/Games/Games';
 import GamePage from "./components/Main/Games/GamePage/GamePage"
+import News from './components/Main/News/News';
+import NewsPage from './components/Main/News/NewsPage';
 export default function App() {
   return (
     <>
@@ -12,7 +14,9 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Home/>}/>
         <Route path="/Games" element={<Games/>}/>
+        <Route path='/News' element={<News/>}/>
         <Route path='/Games/:urlName' element={<GamePage/>}/>
+        <Route path='/News/:newsId' element={<NewsPage/>}/>
       </Routes>
        <Footer/>
       </BrowserRouter>
