@@ -9,9 +9,9 @@ export default function Home(){
         <><BackGround/>
       <Nav/>
       <GamesLink/>
-      <FeaturedGames left={false}/>
-      <FeaturedGames left={true}/>
-      <FeaturedGames left={false}/>
+      <FeaturedGames which={0}/>
+      <FeaturedGames which={1}/>
+      <FeaturedGames which={2}/>
       <NewsPanels/>
       </>
     )

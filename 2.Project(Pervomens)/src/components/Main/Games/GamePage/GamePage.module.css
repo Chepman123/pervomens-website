@@ -129,3 +129,18 @@
     z-index: -1;
     width: 100%;
 }
+.button{
+    padding: 20px;
+    padding-left: 30px;
+    padding-right: 30px;
+    background: none;
+    color: white;
+    border: 1px solid white;
+    border-radius: 40px;
+    transition: all 0.2s ease-in-out;
+}
+.button:hover{
+    cursor: pointer;
+    background-color: white;
+    color: #000000;
+}

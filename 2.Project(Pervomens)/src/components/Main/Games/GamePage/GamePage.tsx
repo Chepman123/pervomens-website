@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import SimpleButton from "../../../Buttons/SimpleButton/SimpleButton";
 import Tag from "../../../Tag/Tag";
 import classes from "./GamePage.module.css";
 import type { gameData } from '../../../../data/gameData'
@@ -24,7 +23,7 @@ export default function GamePage(){
 }
     return(<>
     <video className={classes.video} autoPlay muted loop>
-        <source src="/Background/bg1.mp4" type="video/mp4"/>
+        <source src={'/GameData/'+data.tittle+'/Trailer.mp4'} type="video/mp4"/>
     </video>
     <div className={classes.div}>
         <div>
@@ -48,8 +47,8 @@ export default function GamePage(){
             <p className={classes.p}>{data.description}</p>
         </article>
         <section className={classes.buttons}>
-            <SimpleButton buttonType="nav">Donwload last version</SimpleButton>
-            <SimpleButton buttonType="nav">View other versions</SimpleButton>
+            <button className={classes.button}>Donwload last version</button>
+            <button className={classes.button}>View other versions</button>
         </section>
         <div className={classes.border}/>
         </div>
