@@ -6,11 +6,13 @@ import Games from './components/Main/Games/Games';
 import GamePage from "./components/Main/Games/GamePage/GamePage"
 import News from './components/Main/News/News';
 import NewsPage from './components/Main/News/NewsPage';
+import ScrollToStart from './components/ScrollToStart';
 export default function App() {
   return (
     <>
       <BrowserRouter>
       <Header/>
+      <ScrollToStart/>
       <Routes>
         <Route path="/" element={<Home/>}/>
         <Route path="/Games" element={<Games/>}/>

@@ -7,6 +7,7 @@ export default function ImageFullScreen({data,screenshot}:{data:gameData,screens
     const[open,setModal] = useState<boolean>(false);
     function showModal(){
       setModal(!open);
+      
     }
 
     return(<>

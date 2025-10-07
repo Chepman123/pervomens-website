@@ -7,7 +7,10 @@ export default function Modal({open,func,data,which}:{open:boolean,func:() =>voi
     const modalElement=useRef<HTMLDialogElement>(null);
     useEffect(()=>{
         if(open) modalElement.current?.showModal();
-        else modalElement.current?.close();
+        else{ 
+            modalElement.current?.close();
+            setCurrentIndex(which);
+        }
     },[open])
 
     const [currentIndex, setCurrentIndex] = useState(which);
@@ -20,12 +23,13 @@ export default function Modal({open,func,data,which}:{open:boolean,func:() =>voi
     if (next >= data.screenshots.length) next = 0;
     return next;
   });
+  
 }
 
 
     return createPortal(
         
-        <dialog ref={modalElement} className={classes.dialog}>
+        <dialog ref={modalElement} className={classes.dialog} >
             <img src={src} className={classes.img}/>
             <div className={classes.buttons}>
                 <a onClick={() => changeImage(-1)}>{"<"}</a>
