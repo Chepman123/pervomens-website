@@ -7,6 +7,9 @@ import GamePage from "./components/Main/Games/GamePage/GamePage"
 import News from './components/Main/News/News';
 import NewsPage from './components/Main/News/NewsPage';
 import ScrollToStart from './components/ScrollToStart';
+import Login from './components/RegLog/Login';
+import Reg from './components/RegLog/Reg';
+import Profile from './components/Profile/Profile';
 export default function App() {
   return (
     <>
@@ -19,6 +22,9 @@ export default function App() {
         <Route path='/News' element={<News/>}/>
         <Route path='/Games/:urlName' element={<GamePage/>}/>
         <Route path='/News/:newsId' element={<NewsPage/>}/>
+        <Route path='/Login' element={<Login/>}/>
+        <Route path='/Reg' element={<Reg/>}/>
+        <Route path='/profile/:username' element={<Profile/>}/>
       </Routes>
        <Footer/>
       </BrowserRouter>

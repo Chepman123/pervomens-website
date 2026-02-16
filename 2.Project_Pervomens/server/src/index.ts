@@ -1,11 +1,14 @@
 import express from 'express';
 import cors from 'cors';
-import Routes from './Routes';
 import helmet from "helmet";
-
+import Reg from '../src/Routes/RegLog'
+import Main from './Routes/Main';
+import User from './Routes/User';
+const cookieParser = require('cookie-parser');
 const app = express();
 app.use(helmet());
 app.use(express.json({limit:'10mb'}));
+app.use(cookieParser());
 
 const allowedOrigins = ['https://dantway.pl', 'http://localhost:5173'];
 
@@ -26,7 +29,9 @@ app.use(cors({
 
 app.options('*', cors());
 
-app.use('/', Routes());
+app.use('/', Reg());
+app.use('/', Main());
+app.use('/profile/', User());
 
 const PORT = 5000;
 app.listen(PORT, () => console.log(`Server started on port ${PORT}`));

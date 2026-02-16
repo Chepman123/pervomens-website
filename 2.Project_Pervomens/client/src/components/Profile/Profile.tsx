@@ -1,0 +1,83 @@
+import { useNavigate, useParams } from "react-router-dom";
+import Header from "../../Header/Header";
+import userIcon from '../../../../public/User.png'
+import { useEffect, useState } from "react";
+import type { User } from "../../../interfaces/User";
+import classes from './Profile.module.scss'
+import Footer from "../../Footer/Footer";
+export default function Profile(){
+    const navigate = useNavigate()
+    const {username} = useParams();
+    const[editMode,setEditMode] = useState<boolean>(false);
+    const[user,setUser] = useState<User>({username:username!,description:"",avatar:""});
+    async function GetInfo() {
+        const response = await fetch(`http://localhost:5000/profile/${username}`);
+        setUser(await response.json())
+    }
+
+
+async function SaveProfile() {
+  if (!user) return;
+
+  let avatarData: string | null = null;
+
+  if (user.avatar instanceof File) {
+    avatarData = await new Promise<string | null>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = () => reject(null);
+      reader.readAsDataURL(user.avatar);
+    });
+  }
+
+  await fetch(`http://localhost:5000/profile/${username}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      username,
+      description: user.description,
+      avatar: avatarData?avatarData:user.avatar,
+    }),
+  });
+
+  setEditMode(false);
+  navigate(0);
+
+}
+
+
+    useEffect(()=>{
+    GetInfo();
+    },[])
+    return<><Header/> <main className={classes.main}>
+        <div className={classes.div}>
+        {!editMode&&
+        <div>
+            <img src={user?.avatar?user.avatar:userIcon}/>
+            <h1>{username}</h1>
+            <p>{user?.description}</p>
+            <button onClick={()=>setEditMode(true)}>Edit profile</button>
+        </div>}
+        {editMode&&
+        <div> 
+            <input
+  type="file"
+  onChange={(e) => {
+    const file = e.target.files?.[0] ?? null;
+    setUser(prev => prev ? { ...prev, avatar: file } : prev);
+  }}
+/>
+
+           <textarea
+  placeholder="description"
+  value={user?.description ?? ""}
+  onChange={(e) =>
+    setUser(prev =>
+      prev ? { ...prev, description: e.target.value } : prev
+    )
+  }
+/>
+            <button onClick={SaveProfile}>Save</button>
+        </div>}
+   </div> </main><Footer/></>
+}
