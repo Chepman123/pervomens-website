@@ -1,6 +1,6 @@
-import GameCard from "../../GameCard/GameCard";
+import GameCard from "../../../GameCard/GameCard";
 import classes from './Games.module.css'
-import {data} from '../../../data/gameData'
+import {data} from '../../../../data/gameData'
 
 export default function Games(){
     return(

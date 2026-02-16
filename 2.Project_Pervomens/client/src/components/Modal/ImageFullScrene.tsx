@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import Modal from './Modal';
-import classes from "../Main/Games/GamePage/GamePage.module.css";
+import classes from "../Pages/Main/Games/Games.module.css";
 import type { gameData } from '../../data/gameData';
 
 export default function ImageFullScreen({data,screenshot}:{data:gameData,screenshot:string}){

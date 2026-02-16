@@ -26,6 +26,14 @@ export default function Footer() {
         <a href="https://www.youtube.com/@perv_comp" target="_blank" rel="noreferrer" className={`${classes.icon} ${classes.youtube}`}>
           <i className="fab fa-youtube"></i>
         </a>
+       <a 
+  href="https://discord.gg/ZDwyztSvPv" 
+  target="_blank" 
+  rel="noreferrer" 
+  className={`${classes.icon} ${classes.discord}`}
+>
+  <i className="fab fa-discord"></i>
+</a>
        <a href="https://gamejolt.com/@PERVOMENS_GAMES" target="_blank" rel="noreferrer" className={`${classes.icon} ${classes.gamejolt}`}>
           <img src={gamejolt} alt="GJ" />
        </a>
