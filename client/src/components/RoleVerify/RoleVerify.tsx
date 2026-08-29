@@ -9,7 +9,7 @@ export default function RoleVerify(){
   credentials: 'include', 
 });
 const result:{username:string,role:'customer'|'admin'} = await response.json();
-        if(result.role == 'customer')  navigate('/');
+        if(result.role != 'admin')  navigate('/');
     }
     useEffect(()=>{
          GetData();
