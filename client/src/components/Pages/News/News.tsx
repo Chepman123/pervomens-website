@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 
 export default function News(){
     async function getData(){
-      const response = await fetch('http://localhost:5000/News');
+      const response = await fetch('https://pervomens-website-2.onrender.com/News');
       setData(await response.json());
     }
     useEffect(()=>{

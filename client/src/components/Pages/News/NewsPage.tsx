@@ -9,7 +9,7 @@ export default function NewsPage(){
    const {newsId} = useParams<string>();
    const[reviews,setReviews] = useState<Review[]>([]);
    async function GetData() {
-      const response = await fetch(`http://localhost:5000/News/${newsId}`);
+      const response = await fetch(`https://pervomens-website-2.onrender.com/News/${newsId}`);
       const result = await response.json();
       setReviews(result.reviews);
       setNews(result.news);
