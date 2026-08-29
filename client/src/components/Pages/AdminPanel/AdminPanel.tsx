@@ -19,7 +19,7 @@ export default function AdminPanel(){
   }
 
 
-       fetch('http://localhost:5000/AdminPanel',{
+       fetch('https://pervomens-website-2.onrender.com/AdminPanel',{
         method:'POST',
         headers:{'Content-Type':'application/json'},
         body:JSON.stringify({post,fileData,index:game}),

@@ -40,7 +40,7 @@ export default function Header(){
 const[role,setRole] = useState<'customer'|'admin'>();
  const[username,setUsername] = useState<string>();
     async function GetData() {
-        const response = await fetch("http://localhost:5000", {
+        const response = await fetch("https://pervomens-website-2.onrender.com", {
   method: 'GET',
   credentials: 'include', 
 });
@@ -54,7 +54,7 @@ const result:{user:{username:string,role:'customer'|'admin'},notifications:Notif
          GetData();
     },[])
     function readNotif(){
-        fetch("http://localhost:5000",{
+        fetch("https://pervomens-website-2.onrender.com",{
             method:'PATCH'
         });
     }

@@ -10,7 +10,7 @@ export default function Profile(){
     const[editMode,setEditMode] = useState<boolean>(false);
     const[user,setUser] = useState<User>({username:username!,description:"",avatar:""});
     async function GetInfo() {
-        const response = await fetch(`http://localhost:5000/profile/${username}`);
+        const response = await fetch(`https://pervomens-website-2.onrender.com/profile/${username}`);
         setUser(await response.json())
     }
 
@@ -28,7 +28,7 @@ async function SaveProfile() {
     });
   }
 
-  await fetch(`http://localhost:5000/profile/${username}`, {
+  await fetch(`https://pervomens-website-2.onrender.com/profile/${username}`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({

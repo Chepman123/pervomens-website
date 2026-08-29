@@ -6,7 +6,7 @@ export default function NewsPanels() {
 
 async function getData(){
  
-      const response = await fetch('http://localhost:5000/News/Main');
+      const response = await fetch('https://pervomens-website-2.onrender.com/News/Main');
       setData(await response.json());
     }
     useEffect(()=>{

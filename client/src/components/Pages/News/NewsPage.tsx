@@ -18,7 +18,7 @@ export default function NewsPage(){
       GetData();
    })
    async function SendReview(){
-      await fetch(`http://localhost:5000/News/${newsId}`,{
+      await fetch(`https://pervomens-website-2.onrender.com/News/${newsId}`,{
          method:'POST',
          headers:{'Content-Type':'application/json'},
          body:JSON.stringify({review}),
