@@ -8,7 +8,7 @@ export default()=>{
    const controller:Con = new Con(service);
 
    router.get("/:username",(req:Request,res:Response)=>controller.GetData(req,res));
-   router.post("/:username",(req:Request,res:Response)=>controller.SaveProfile(req,res));
+   router.put("/:username",(req:Request,res:Response)=>controller.SaveProfile(req,res));
 
    return router;
 }

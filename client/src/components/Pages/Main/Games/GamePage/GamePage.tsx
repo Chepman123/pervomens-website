@@ -47,8 +47,7 @@ export default function GamePage(){
             <p className={classes.p}>{data.description}</p>
         </article>
         <section className={classes.buttons}>
-            <button className={classes.button}>Donwload last version</button>
-            <button className={classes.button}>View other versions</button>
+            <a className={classes.button} href={data.link}>Donwload last version</a>
         </section>
         <div className={classes.border}/>
         </div>

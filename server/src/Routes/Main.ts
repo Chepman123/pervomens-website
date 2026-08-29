@@ -8,6 +8,6 @@ export default()=>{
    const controller:Con = new Con(service);
 
    router.get("/",(req:Request,res:Response)=>controller.GetDataHeader(req,res));
-
+   router.patch("/",(req:Request,res:Response)=>controller.ReadNotif());
    return router;
 }

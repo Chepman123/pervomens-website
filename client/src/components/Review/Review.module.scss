@@ -1,0 +1,29 @@
+.h1{
+    color: white;
+}
+.p{
+    color: white;
+}
+.img{
+    width: 150px;
+    border-radius: 200px;
+}
+.div{
+    display: flex;
+    justify-self: center;
+    margin-bottom: 20px;
+    border-bottom: 1px solid rgb(101, 101, 101);
+    width: 50%;
+}
+.h3{
+    color: white;
+    opacity: 0.4;
+    justify-self: end;
+    margin-left: 500px;
+}
+.message{
+    margin-left: 50px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}

@@ -1,22 +1,24 @@
+import type { newsData } from '../../../data/newsData'
 import Tag from '../../Tag/Tag'
 import classes from './NewsPanel.module.css'
-import { data } from '../../../data/newsData'
 import { Link } from 'react-router-dom'
 
-export default function NewsPanel({which}:{which:number}){
+export default function NewsPanel({data}:{data:newsData}){
     return (
-        <Link to={'/News/'+which} className={classes.a}>
-            <img src={'/NewsData/'+which+'.jpg'} className={classes.img}/>
+        <Link to={'/News/'+data.id} className={classes.a}>
+            <img src={data.image} className={classes.img}/>
             <div className={classes.tags}>
-                <Tag>{data[which].type}</Tag>
-                <Tag>{data[which].game}</Tag>
+                <Tag>Game</Tag>
+                <Tag>{data.game}</Tag>
             </div>
             <div className={classes.info}>
-                <h2 className={classes.h2}>{data[which].tittle}</h2>
+                <h2 className={classes.h2}>{data.title}</h2>
                 <div className={classes.borderDiv}/>
-                <p className={classes.p}>{data[which].post}</p>
+                <p className={classes.p}>{data.content}</p>
             </div>
-            <p className={classes.p}>{data[which].data}</p>
+           <p className={classes.p}>
+    {`${new Date(data.createdat).getFullYear()}.${String(new Date(data.createdat).getMonth() + 1).padStart(2, '0')}.${String(new Date(data.createdat).getDate()).padStart(2, '0')}`}
+</p>
         </Link>
     )
 }

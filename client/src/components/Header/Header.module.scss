@@ -11,12 +11,32 @@ header{
     background-color: rgba(0, 0, 0, var(--header-color)); 
     box-shadow: 0px 4px 15px var(--header-shadow) #000000;
     background-color: null;
+    button{
+      background: none;
+      border: none;
+      color: white;
+      position: relative;
+      top: 5px;
+    }
+    button:hover{
+      cursor: pointer;
+    }
+    ul{
+      position: absolute;
+      right: 0px;
+      top: 30px;
+
+    }
+}
+.h3{
+  background-color: tomato;
+  color: white;
+  border-radius: 40px;
 }
 .scrolledHeader1{
     background-color: rgba(0, 0, 0, 0.75); 
     box-shadow: 0px 4px 15px -1px #000000;
 }
-
 .div{
     margin-right: 40px;
 }

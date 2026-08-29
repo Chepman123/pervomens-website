@@ -7,7 +7,11 @@ export default class Con{
 
   async GetDataHeader(req:Request,res:Response){
     const token = req.cookies.token;
-    const username = token?(jwt.verify(token, process.env.SECRET!)as {username:string}).username:null;
-    res.json(username);
+    const user = token?(jwt.verify(token, process.env.SECRET!) as {username:string,role:string}):null;
+    const notifications = await this.service.GetHeaderData();
+    res.json({user,notifications});
+ }
+ async ReadNotif(){
+  this.service.ReadNotif();
  }
 }

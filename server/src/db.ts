@@ -1,7 +1,15 @@
-import {MongoClient} from 'mongodb';
+import { Pool } from 'pg';
 import dotenv from 'dotenv';
 import path from 'path';
 
-dotenv.config({ path: path.resolve(__dirname, "../src/.env") });
 
-export default new MongoClient(process.env.URL!).connect();
+dotenv.config({ path: path.resolve(__dirname, "../src/.env") });
+const pool = new Pool({
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+  port: Number(process.env.DB_PORT)
+});
+
+export default pool;

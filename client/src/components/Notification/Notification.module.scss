@@ -1,0 +1,10 @@
+.a{
+      background-color: black;
+        padding: 10px 20px 10px 20px;
+        border: 1px solid white;
+        transition: 0.2s all ease-in-out;
+}
+.a:hover{
+    background-color: white;
+    color: black;
+}

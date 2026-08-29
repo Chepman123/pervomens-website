@@ -18,12 +18,19 @@
     height: 100%;
     object-fit: contain;
     margin-right: 50px;
-    border-radius: 40px;
+    border-radius: 0px;
 }
 .tags{
     margin-left: 30px;
     display: flex;
     text-shadow: 2px 2px 4px rgba(0,0,0,0.7); 
+}
+.screenshots img{
+    height: 200px;
+    border-radius: 15px;
+}
+.screenshots img:hover{
+    cursor: zoom-in;
 }
 @media(max-width:765px){
  .div{

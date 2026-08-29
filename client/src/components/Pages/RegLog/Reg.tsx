@@ -2,6 +2,7 @@ import { useState } from "react"
 import { Link, useNavigate } from "react-router-dom";
 import classes from "./RegLog.module.scss";
 import type { RegLogResult } from "../../../interfaces/LogReg";
+import BackGround from "../../BackGround/BackGround";
 
 export default function Reg(){
     const [username,setUsername] = useState<string>("");
@@ -21,6 +22,7 @@ export default function Reg(){
     }
 
     return <main className={classes.main}>
+        <BackGround/>
     <form className={classes.form}>
         <h1>Sign up</h1>
         <input type="text" placeholder="username" value={username} onChange={(e)=>setUsername(e.target.value)}/>

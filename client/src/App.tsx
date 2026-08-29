@@ -10,6 +10,8 @@ import Games from './components/Pages/Main/Games/Games';
 import News from './components/Pages/News/News';
 import GamePage from './components/Pages/Main/Games/GamePage/GamePage';
 import NewsPage from './components/Pages/News/NewsPage';
+import AdminPanel from './components/Pages/AdminPanel/AdminPanel';
+import NewsCreator from './components/Pages/NewsCreator/NewsCreator';
 export default function App() {
   return (
     <>
@@ -25,6 +27,8 @@ export default function App() {
         <Route path='/Login' element={<Login/>}/>
         <Route path='/Reg' element={<Reg/>}/>
         <Route path='/profile/:username' element={<Profile/>}/>
+        <Route path='/AdminPanel' element={<AdminPanel/>}/>
+        <Route path='/NewsCreator' element={<NewsCreator/>}/>
       </Routes>
        <Footer/>
       </BrowserRouter>

@@ -1,19 +1,89 @@
 .main{
    padding-top: 60px;
-   
-img {
+}
+.main img {
+   margin-top: 20px;
+   margin-left: 20px;
   width: 200px;
   height: 200px;
   border-radius: 50%;
   object-fit: cover;
 }
 .div{
-   background-color: rgb(238, 220, 197);
+   background-color: rgb(1, 1, 1);
    margin-top: 200px;
    padding-bottom: 200px;
    width: 90%;
    border-top-left-radius: 50px;
    border-top-right-radius: 50px;
    justify-self: center;
+   box-shadow: 0px -8px 15px 5px #000000;
+   color: white;
+   div{
+   display: flex;
+   }
 }
+.desc{
+   margin-top: 100px;
+   margin-left: 20px;
+display: flex;
+flex-direction: column;
+h1{
+   font-size: 50px;
+}
+    
+}
+.main button{
+      margin-top: 20px;
+        background: black;
+        color: white;
+        border: 1px solid white;
+        border-radius: 20px;
+        font-size: 20px;
+        padding: 10px 20px;
+        transition: all 0.2s ease-in-out;
+    }
+    .main button:hover{
+        cursor: pointer;
+        color: black;
+        background-color: white;
+    }
+    label{
+      margin-top: 20px;
+      margin-left: 20px;
+      border:1px solid white;
+      border-radius: 20px;
+      padding: 10px 20px 10px 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 30px;
+      margin-right: 20px;
+
+    }
+    label:hover{
+      cursor: pointer;
+    }
+.input {
+ margin-top: 20px;
+ margin-left: 20px;
+  background-color: #000000;
+  border-radius: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white; 
+  display: none;
+  box-sizing: border-box;
+}
+
+.textarea{
+background-color: black;
+border-radius: 1px solid white;
+color: white;
+border-radius: 20px;
+padding-left: 10px;
+margin-top: 20px;
+padding-top: 10px;
+margin-right: 20px;
 }

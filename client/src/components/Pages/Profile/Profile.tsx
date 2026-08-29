@@ -1,10 +1,9 @@
 import { useNavigate, useParams } from "react-router-dom";
-import Header from "../../Header/Header";
 import userIcon from '../../../../public/User.png'
 import { useEffect, useState } from "react";
 import type { User } from "../../../interfaces/User";
 import classes from './Profile.module.scss'
-import Footer from "../../Footer/Footer";
+import BackGround from "../../BackGround/BackGround";
 export default function Profile(){
     const navigate = useNavigate()
     const {username} = useParams();
@@ -14,7 +13,6 @@ export default function Profile(){
         const response = await fetch(`http://localhost:5000/profile/${username}`);
         setUser(await response.json())
     }
-
 
 async function SaveProfile() {
   if (!user) return;
@@ -31,7 +29,7 @@ async function SaveProfile() {
   }
 
   await fetch(`http://localhost:5000/profile/${username}`, {
-    method: "POST",
+    method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       username,
@@ -49,19 +47,23 @@ async function SaveProfile() {
     useEffect(()=>{
     GetInfo();
     },[])
-    return<><Header/> <main className={classes.main}>
+    return<><main className={classes.main}>
+      <BackGround/>
         <div className={classes.div}>
         {!editMode&&
         <div>
             <img src={user?.avatar?user.avatar:userIcon}/>
+            <div className={classes.desc}>
             <h1>{username}</h1>
             <p>{user?.description}</p>
             <button onClick={()=>setEditMode(true)}>Edit profile</button>
+            </div>
         </div>}
         {editMode&&
         <div> 
+          <label htmlFor="avatar">Set avatar</label>
             <input
-  type="file"
+  type="file" className={classes.input} name="avatar" id="avatar"
   onChange={(e) => {
     const file = e.target.files?.[0] ?? null;
     setUser(prev => prev ? { ...prev, avatar: file } : prev);
@@ -69,6 +71,7 @@ async function SaveProfile() {
 />
 
            <textarea
+           className={classes.textarea}
   placeholder="description"
   value={user?.description ?? ""}
   onChange={(e) =>
@@ -79,5 +82,5 @@ async function SaveProfile() {
 />
             <button onClick={SaveProfile}>Save</button>
         </div>}
-   </div> </main><Footer/></>
+   </div> </main></>
 }

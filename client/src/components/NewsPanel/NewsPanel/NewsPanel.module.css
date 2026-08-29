@@ -9,6 +9,10 @@
     border-radius: 20px;
     text-decoration: none;
 }
+.a img{
+    width: 100%;
+    object-fit: contain;
+}
 @media(max-width:768px){
     .a{
         width: 300px;

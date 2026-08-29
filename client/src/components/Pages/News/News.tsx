@@ -1,9 +1,18 @@
 import NewsPanel from '../../NewsPanel/NewsPanel/NewsPanel';
-import classes from './News.module.css';
+import classes from './News.module.scss';
 import NewsPage from './NewsPage';
-import {data} from '../../../data/newsData'
+import type { newsData } from '../../../data/newsData';
+import { useEffect, useState } from 'react';
 
 export default function News(){
+    async function getData(){
+      const response = await fetch('http://localhost:5000/News');
+      setData(await response.json());
+    }
+    useEffect(()=>{
+       getData();
+    })
+    const[data,setData] = useState<newsData[]>([]);
     return (
      <section className={classes.allNews}>
         
@@ -11,7 +20,7 @@ export default function News(){
      <div className={classes.newsPanels}>
      {data.map((news)=>{
         return(
-            <NewsPanel which={data.indexOf(news)}/>
+            <NewsPanel data={news}/>
         );
      })}</div>
      </section>
