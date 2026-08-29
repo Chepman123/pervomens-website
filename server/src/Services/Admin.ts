@@ -187,7 +187,7 @@ export default class AdminService{
             if (file.startsWith('http://') || file.startsWith('https://')) {
                 const response = await axios.get(file, { responseType: 'arraybuffer' });
                 buffer = Buffer.from(response.data);
-                contentType = response.headers['content-type'] || '';
+              contentType = String(response.headers['content-type'] ?? '');
                 if (contentType.includes('video/mp4') || file.includes('.mp4')) ext = 'mp4';
                 else if (contentType.includes('video/quicktime') || file.includes('.mov')) ext = 'mov';
                 else if (contentType.includes('image/png') || file.includes('.png')) ext = 'png';
