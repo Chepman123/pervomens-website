@@ -9,7 +9,7 @@ export default function Login(){
     const [password,setPassword] = useState<string>("");
     const [result,setResult] = useState<RegLogResult>(null);
     async function Login(){
-           const response = await fetch("http://localhost:5000/Login",{
+           const response = await fetch("https://pervomens-website-2.onrender.com/Login",{
             method:"POST",
             headers:{"Content-type":"application/json"},
             body:JSON.stringify({username:username,password:password}),
