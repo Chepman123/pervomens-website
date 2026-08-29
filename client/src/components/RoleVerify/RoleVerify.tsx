@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 export default function RoleVerify(){
     const navigate = useNavigate();
      async function GetData() {
-        const response = await fetch("http://localhost:5000", {
+        const response = await fetch("https://pervomens-website-2.onrender.com", {
   method: 'GET',
   credentials: 'include', 
 });
