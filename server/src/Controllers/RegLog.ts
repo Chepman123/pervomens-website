@@ -9,7 +9,7 @@ export default class RegLogCon{
       res.cookie('token',result.token,{
                 httpOnly:true,
                 secure:true,
-                sameSite:'strict',
+                sameSite:'none',
                 maxAge:7*24*60*60*1000
             })
       res.json(result.result);
@@ -19,7 +19,7 @@ export default class RegLogCon{
      res.cookie('token',result.token,{
                 httpOnly:true,
                 secure:true,
-                sameSite:'strict',
+                sameSite:'none',
                 maxAge:7*24*60*60*1000
             })
     res.json(result.result);
