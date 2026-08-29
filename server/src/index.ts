@@ -12,7 +12,7 @@ app.use(helmet());
 app.use(express.json({limit:'10mb'}));
 app.use(cookieParser());
 
-const allowedOrigins = ['https://dantway.pl', 'http://localhost:5173'];
+const allowedOrigins = ['https://pervomens-website-ruddy.vercel.app','https://pervomens-website-ruddy.vercel.app/?_vercel_share=uyat8wNZIvXgaurg66yBDvrDSsxgGeTW', 'http://localhost:5173'];
 
 app.use(cors({
   origin: function(origin, callback) {
