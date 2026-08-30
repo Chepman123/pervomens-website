@@ -13,6 +13,15 @@ export default function Header(){
    const[style,changeStyle] = useState<CSSProperties>();
    const[showNotif,setShow] = useState<boolean>(false);
    const[notifications,setNotifications] = useState<Notification[]>([]);
+   const[displayHeader,setDisplay] = useState<boolean>(true);
+   const[isMobile,setMobile] = useState<boolean>(false);
+   
+
+   useEffect(()=>{
+       const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+       if(isMobile) setDisplay(false);
+       setMobile(isMobile);
+   },[])
    useEffect(() => {
     const scrollEffect = () => {
         let scrollCount = window.scrollY;
@@ -60,7 +69,7 @@ const result:{user:{username:string,role:'customer'|'admin'},notifications:Notif
     }
     return (
         <header style={style}>
-            <div className={classes.div}>
+            <div className={classes.div} style={{display:displayHeader?'flex':'none'}}> 
                 <Link to="/">Home</Link>
                 <Link to="/Games">Games</Link>
                 <Link to="/News">News</Link>
@@ -100,7 +109,7 @@ const result:{user:{username:string,role:'customer'|'admin'},notifications:Notif
             </>
             }
             </div>
-            
+            <button className={classes.mobileButton} onClick={()=>setDisplay(!displayHeader)}>☰</button>
         </header>
     )
 }

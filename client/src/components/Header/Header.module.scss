@@ -71,8 +71,31 @@ header a{
     opacity: 1;
     transform: translateY(-2.5px);
 }
+.mobileButton{
+  display: none;
+}
 @media (max-width: 768px) {
-   header {
-    display: none;
+  header{
+    
+    width: 100%;
+    height: 500px;
+    flex-direction: column;
+  }
+  .div{
+    flex-direction: column;
+    padding-top: 100px;
+    width: 100%;
+    height: 100%;
+    background-color: black;
+    a{
+      font-size: 35px;
+    }
+  }
+  .mobileButton{
+    display: block;
+    font-size: 50px;
+    margin-top: -10px;
+    position: absolute;
+    left: 10px;
   }
 }
