@@ -8,8 +8,8 @@ export default function RoleVerify(){
   method: 'GET',
   credentials: 'include', 
 });
-const result:{username:string,role:'customer'|'admin'} = await response.json();
-        if(result.role != 'admin')  navigate('/');
+const result:{user:{username:string,role:'customer'|'admin'},notifications:Notification[]} = await response.json();
+        if(result.user.role != 'admin')  navigate('/');
     }
     useEffect(()=>{
          GetData();
