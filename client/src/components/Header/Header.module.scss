@@ -78,14 +78,14 @@ header a{
   header{
     
     width: 100%;
-    height: 500px;
+    
     flex-direction: column;
   }
   .div{
     flex-direction: column;
     padding-top: 100px;
     width: 100%;
-    height: 100%;
+    height: 500px;
     background-color: black;
     a{
       font-size: 35px;

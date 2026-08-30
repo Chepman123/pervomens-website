@@ -69,7 +69,7 @@ const result:{user:{username:string,role:'customer'|'admin'},notifications:Notif
     }
     return (
         <header style={style}>
-            <div className={classes.div} style={{display:displayHeader?'flex':'none'}}> 
+            <div className={classes.div} style={{display:displayHeader?'flex':'none',height:displayHeader?'500px':'0px'}}> 
                 <Link to="/">Home</Link>
                 <Link to="/Games">Games</Link>
                 <Link to="/News">News</Link>
