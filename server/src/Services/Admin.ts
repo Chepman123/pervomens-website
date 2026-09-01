@@ -252,73 +252,79 @@ export default class AdminService {
         });
     }
 
-   async uploadToBlueSky(fileData: string, mimeType: string) {
-    const base64Data = fileData.includes(',') ? fileData.split(',')[1] : fileData;
-    const buffer = Buffer.from(base64Data, 'base64');
+  async uploadToBlueSky(fileData: string, mimeType: string) {
+        const base64Data = fileData.includes(',') ? fileData.split(',')[1] : fileData;
+        const buffer = Buffer.from(base64Data, 'base64');
 
-    // Handle videos using the dedicated Bluesky video service pipeline
-    if (mimeType.startsWith('video/')) {
-        const userDid = agent.session!.did;
-        const pdsHost = await getPdsHost(userDid);
+        // Handle videos using the dedicated Bluesky video service pipeline
+        if (mimeType.startsWith('video/')) {
+            const userDid = agent.session!.did;
+            const pdsHost = await getPdsHost(userDid);
 
-        const { data: serviceAuth } = await agent.com.atproto.server.getServiceAuth({
-            aud: `did:web:${pdsHost}`,
-            lxm: "com.atproto.repo.uploadBlob",
-            exp: Math.floor(Date.now() / 1000) + 60 * 30,
-        });
-
-        const uploadUrl = new URL("https://video.bsky.app/xrpc/app.bsky.video.uploadVideo");
-        uploadUrl.searchParams.append("did", userDid);
-        uploadUrl.searchParams.append("name", "video.mp4");
-
-        const uploadResponse = await fetch(uploadUrl, {
-            method: "POST",
-            headers: {
-                Authorization: `Bearer ${serviceAuth.token}`,
-                "Content-Type": mimeType,
-                "Content-Length": String(buffer.length),
-            },
-            body: buffer,
-        });
-
-        const jobStatus = await uploadResponse.json() as any;
-
-        if (!uploadResponse.ok && jobStatus.error !== 'already_exists') {
-            throw new Error(`Помилка завантаження відео: ${JSON.stringify(jobStatus)}`);
-        }
-
-        const videoAgent = new BskyAgent({ service: "https://video.bsky.app" });
-        let blob = jobStatus.blob;
-
-        // Poll until video transcoding is complete
-        while (!blob && jobStatus.jobId) {
-            await new Promise(r => setTimeout(r, 3000));
-            const { data: status } = await videoAgent.app.bsky.video.getJobStatus({
-                jobId: jobStatus.jobId,
+            const { data: serviceAuth } = await agent.com.atproto.server.getServiceAuth({
+                aud: `did:web:${pdsHost}`,
+                lxm: "com.atproto.repo.uploadBlob",
+                exp: Math.floor(Date.now() / 1000) + 60 * 30,
             });
 
-            if (status.jobStatus.state === 'JOB_STATE_COMPLETED') {
-                blob = status.jobStatus.blob;
-                break;
-            } else if (status.jobStatus.state === 'JOB_STATE_FAILED') {
-                throw new Error(`Транскодування відео провалилось: ${status.jobStatus.error || 'невідома помилка'}`);
+            const uploadUrl = new URL("https://video.bsky.app/xrpc/app.bsky.video.uploadVideo");
+            uploadUrl.searchParams.append("did", userDid);
+            uploadUrl.searchParams.append("name", "video.mp4");
+
+            const uploadResponse = await fetch(uploadUrl, {
+                method: "POST",
+                headers: {
+                    Authorization: `Bearer ${serviceAuth.token}`,
+                    "Content-Type": mimeType,
+                    "Content-Length": String(buffer.length),
+                },
+                body: buffer,
+            });
+
+            const jobStatus = await uploadResponse.json() as any;
+
+            if (!uploadResponse.ok && jobStatus.error !== 'already_exists') {
+                throw new Error(`Помилка завантаження відео: ${JSON.stringify(jobStatus)}`);
             }
-        }
 
-        if (!blob) {
-            throw new Error("Не вдалося отримати blob відео після обробки.");
-        }
+            const videoAgent = new BskyAgent({ service: "https://video.bsky.app" });
+            let blob = jobStatus.blob;
 
-        return blob; // This returns the special video blob object required for video embeds
-    } 
-    
-    // Handle standard images (JPEG, PNG, etc.)
-    const upload = await agent.uploadBlob(buffer, { encoding: mimeType });
-    if (!upload?.data?.blob) {
-        throw new Error("Не вдалося завантажити зображення у Bluesky.");
+            // Poll until video transcoding is complete
+            while (!blob && jobStatus.jobId) {
+                await new Promise(r => setTimeout(r, 3000));
+                const { data: status } = await videoAgent.app.bsky.video.getJobStatus({
+                    jobId: jobStatus.jobId,
+                });
+
+                if (status.jobStatus.state === 'JOB_STATE_COMPLETED') {
+                    blob = status.jobStatus.blob;
+                    break;
+                } else if (status.jobStatus.state === 'JOB_STATE_FAILED') {
+                    throw new Error(`Транскодування відео провалилось: ${status.jobStatus.error || 'невідома помилка'}`);
+                }
+            }
+
+            if (!blob) {
+                throw new Error("Не вдалося отримати blob відео після обробки.");
+            }
+
+            // Повертаємо чітко сформований об'єкт з посиланням на блoб
+            return {
+                $type: 'blob',
+                ref: blob.ref,
+                mimeType: blob.mimeType || mimeType,
+                size: blob.size
+            };
+        } 
+        
+        // Handle standard images (JPEG, PNG, etc.)
+        const upload = await agent.uploadBlob(buffer, { encoding: mimeType });
+        if (!upload?.data?.blob) {
+            throw new Error("Не вдалося завантажити зображення у Bluesky.");
+        }
+        return upload.data.blob;
     }
-    return upload.data.blob;
-}
 
 
     async SendBlueSky(content: string, file?: any) {
