@@ -252,7 +252,7 @@ export default class AdminService {
         });
     }
 
-  async uploadToBlueSky(fileData: string, mimeType: string) {
+ async uploadToBlueSky(fileData: string, mimeType: string) {
         const base64Data = fileData.includes(',') ? fileData.split(',')[1] : fileData;
         const buffer = Buffer.from(base64Data, 'base64');
 
@@ -309,7 +309,9 @@ export default class AdminService {
                 throw new Error("Не вдалося отримати blob відео після обробки.");
             }
 
-            // Повертаємо чітко сформований об'єкт з посиланням на блoб
+            // 🛑 Штучна затримка на 3-4 секунди, щоб PDS встиг зарезервувати/синхронізувати blob
+            await new Promise(r => setTimeout(r, 4000));
+
             return {
                 $type: 'blob',
                 ref: blob.ref,
