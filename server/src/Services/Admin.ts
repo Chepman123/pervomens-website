@@ -277,7 +277,7 @@ export default class AdminService {
             const pdsHost = await getPdsHost(userDid);
 
             const { data: serviceAuth } = await agent.com.atproto.server.getServiceAuth({
-                aud: `did:web:${pdsHost}`,
+                aud: `did:web:video.bsky.app`,
                 lxm: "com.atproto.repo.uploadBlob",
                 exp: Math.floor(Date.now() / 1000) + 60 * 30,
             });
