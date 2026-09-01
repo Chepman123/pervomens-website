@@ -252,10 +252,11 @@ export default class AdminService {
         });
     }
 
-    async uploadToBlueSky(fileData: string, mimeType: string) {
+   async uploadToBlueSky(fileData: string, mimeType: string) {
     const base64Data = fileData.includes(',') ? fileData.split(',')[1] : fileData;
     const buffer = Buffer.from(base64Data, 'base64');
 
+    // Handle videos using the dedicated Bluesky video service pipeline
     if (mimeType.startsWith('video/')) {
         const userDid = agent.session!.did;
         const pdsHost = await getPdsHost(userDid);
@@ -289,6 +290,7 @@ export default class AdminService {
         const videoAgent = new BskyAgent({ service: "https://video.bsky.app" });
         let blob = jobStatus.blob;
 
+        // Poll until video transcoding is complete
         while (!blob && jobStatus.jobId) {
             await new Promise(r => setTimeout(r, 3000));
             const { data: status } = await videoAgent.app.bsky.video.getJobStatus({
@@ -307,11 +309,15 @@ export default class AdminService {
             throw new Error("Не вдалося отримати blob відео після обробки.");
         }
 
-        return blob;
-    } else {
-        const upload = await agent.uploadBlob(buffer, { encoding: mimeType });
-        return upload.data.blob;
+        return blob; // This returns the special video blob object required for video embeds
+    } 
+    
+    // Handle standard images (JPEG, PNG, etc.)
+    const upload = await agent.uploadBlob(buffer, { encoding: mimeType });
+    if (!upload?.data?.blob) {
+        throw new Error("Не вдалося завантажити зображення у Bluesky.");
     }
+    return upload.data.blob;
 }
 
 
