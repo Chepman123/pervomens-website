@@ -268,108 +268,117 @@ export default class AdminService {
         return false;
     }
 
-    async uploadToBlueSky(fileData: string, mimeType: string) {
-        const base64Data = fileData.includes(',') ? fileData.split(',')[1] : fileData;
-        const buffer = Buffer.from(base64Data, 'base64');
+    
 
-        if (mimeType.startsWith('video/')) {
-            const userDid = agent.session!.did;
-            const pdsHost = await getPdsHost(userDid);
+async uploadToBlueSky(fileData: string, mimeType: string) {
+    const VIDEO_SERVICE_DID = 'did:web:video.bsky.app';
+    const base64Data = fileData.includes(',') ? fileData.split(',')[1] : fileData;
+    const buffer = Buffer.from(base64Data, 'base64');
 
-            const { data: serviceAuth } = await agent.com.atproto.server.getServiceAuth({
-                aud: `did:web:video.bsky.app`,
-                lxm: "com.atproto.repo.uploadBlob",
-                exp: Math.floor(Date.now() / 1000) + 60 * 30,
+    if (mimeType.startsWith('video/')) {
+        const userDid = agent.session!.did;
+
+        // Токен ТІЛЬКИ для getUploadLimits
+        const { data: limitsAuth } = await agent.com.atproto.server.getServiceAuth({
+            aud: VIDEO_SERVICE_DID,
+            lxm: "app.bsky.video.getUploadLimits",
+            exp: Math.floor(Date.now() / 1000) + 60 * 30,
+        });
+
+        try {
+            const limitsResponse = await fetch("https://video.bsky.app/xrpc/app.bsky.video.getUploadLimits", {
+                headers: { Authorization: `Bearer ${limitsAuth.token}` }
             });
+            const limits = await limitsResponse.json() as any;
+            console.log("Ліміти на відеозавантаження:", JSON.stringify(limits));
 
-            try {
-                const limitsResponse = await fetch("https://video.bsky.app/xrpc/app.bsky.video.getUploadLimits", {
-                    headers: { Authorization: `Bearer ${serviceAuth.token}` }
-                });
-                const limits = await limitsResponse.json() as any;
-                console.log("Ліміти на відеозавантаження:", JSON.stringify(limits));
-
-                if (limits?.canUpload === false) {
-                    throw new Error(`Досягнуто ліміту на відеозавантаження для акаунта: ${limits.message || 'причина невідома'}`);
-                }
-            } catch (limitsErr: any) {
-                if (limitsErr.message?.startsWith('Досягнуто ліміту')) throw limitsErr;
-                console.warn("⚠️ Не вдалося перевірити ліміти відео:", limitsErr.message || limitsErr);
+            if (limits?.canUpload === false && !limits?.error?.includes('invalid_token')) {
+                throw new Error(`Досягнуто ліміту на відеозавантаження для акаунта: ${limits.message || 'причина невідома'}`);
             }
-
-            const uploadUrl = new URL("https://video.bsky.app/xrpc/app.bsky.video.uploadVideo");
-            uploadUrl.searchParams.append("did", userDid);
-            uploadUrl.searchParams.append("name", `video_${Date.now()}.mp4`);
-
-            const uploadResponse = await fetch(uploadUrl, {
-                method: "POST",
-                headers: {
-                    Authorization: `Bearer ${serviceAuth.token}`,
-                    "Content-Type": mimeType,
-                    "Content-Length": String(buffer.length),
-                },
-                body: buffer,
-            });
-
-            const jobStatus = await uploadResponse.json() as any;
-            console.log("Відповідь uploadVideo:", JSON.stringify(jobStatus));
-
-            if (!uploadResponse.ok && jobStatus.error !== 'already_exists') {
-                throw new Error(`Помилка завантаження відео: ${JSON.stringify(jobStatus)}`);
-            }
-
-            if (jobStatus.error === 'already_exists') {
-                console.warn("⚠️ video.bsky.app повернув already_exists — можливо застарілий/непідтверджений blob із попередньої спроби.");
-            }
-
-            const videoAgent = new BskyAgent({ service: "https://video.bsky.app" });
-            let blob = jobStatus.blob;
-
-            while (!blob && jobStatus.jobId) {
-                await new Promise(r => setTimeout(r, 3000));
-                const { data: status } = await videoAgent.app.bsky.video.getJobStatus({
-                    jobId: jobStatus.jobId,
-                });
-
-                if (status.jobStatus.state === 'JOB_STATE_COMPLETED') {
-                    blob = status.jobStatus.blob;
-                    break;
-                } else if (status.jobStatus.state === 'JOB_STATE_FAILED') {
-                    throw new Error(`Транскодування відео провалилось: ${status.jobStatus.error || 'невідома помилка'}`);
-                }
-            }
-
-            if (!blob) {
-                throw new Error("Не вдалося отримати blob відео після обробки.");
-            }
-
-            const cidString = typeof blob.ref === 'object' && blob.ref !== null && 'toString' in blob.ref
-                ? blob.ref.toString()
-                : String(blob.ref);
-
-            const available = await this.waitForBlobAvailable(userDid, cidString);
-            if (!available) {
-                throw new Error(
-                    `Blob ${cidString} не підтверджено на PDS після очікування. ` +
-                    `Схоже на застарілий/непідтверджений blob із попередньої невдалої спроби (video.bsky.app повернув already_exists). ` +
-                    `Спробуйте перезавантажити відеофайл заново (наприклад, перекодувавши його), щоб отримати новий хеш і уникнути дедуплікації.`
-                );
-            }
-
-            return {
-                $type: 'blob',
-                ref: blob.ref,
-                mimeType: blob.mimeType || mimeType,
-                size: blob.size
-            };
+        } catch (limitsErr: any) {
+            if (limitsErr.message?.startsWith('Досягнуто ліміту')) throw limitsErr;
+            console.warn("⚠️ Не вдалося перевірити ліміти відео:", limitsErr.message || limitsErr);
         }
 
-        const upload = await agent.uploadBlob(buffer, { encoding: mimeType });
-        if (!upload?.data?.blob) {
-            throw new Error("Не вдалося завантажити зображення у Bluesky.");
+        const { data: uploadAuth } = await agent.com.atproto.server.getServiceAuth({
+            aud: VIDEO_SERVICE_DID,
+            lxm: "app.bsky.video.uploadVideo",
+            exp: Math.floor(Date.now() / 1000) + 60 * 30,
+        });
+
+        const uploadUrl = new URL("https://video.bsky.app/xrpc/app.bsky.video.uploadVideo");
+        uploadUrl.searchParams.append("did", userDid);
+        uploadUrl.searchParams.append("name", `video_${Date.now()}.mp4`);
+
+        const uploadResponse = await fetch(uploadUrl, {
+            method: "POST",
+            headers: {
+                Authorization: `Bearer ${uploadAuth.token}`,
+                "Content-Type": mimeType,
+                "Content-Length": String(buffer.length),
+            },
+            body: buffer,
+        });
+
+        const jobStatus = await uploadResponse.json() as any;
+        console.log("Відповідь uploadVideo:", JSON.stringify(jobStatus));
+
+        if (!uploadResponse.ok && jobStatus.error !== 'already_exists') {
+            throw new Error(`Помилка завантаження відео: ${JSON.stringify(jobStatus)}`);
         }
-        return upload.data.blob;
+
+        if (jobStatus.error === 'already_exists') {
+            console.warn("⚠️ video.bsky.app повернув already_exists — можливо застарілий/непідтверджений blob із попередньої спроби.");
+        }
+
+        const videoAgent = new BskyAgent({ service: "https://video.bsky.app" });
+        let blob = jobStatus.blob;
+
+        while (!blob && jobStatus.jobId) {
+            await new Promise(r => setTimeout(r, 3000));
+            const { data: status } = await videoAgent.app.bsky.video.getJobStatus({
+                jobId: jobStatus.jobId,
+            });
+
+            if (status.jobStatus.state === 'JOB_STATE_COMPLETED') {
+                blob = status.jobStatus.blob;
+                break;
+            } else if (status.jobStatus.state === 'JOB_STATE_FAILED') {
+                throw new Error(`Транскодування відео провалилось: ${status.jobStatus.error || 'невідома помилка'}`);
+            }
+        }
+
+        if (!blob) {
+            throw new Error("Не вдалося отримати blob відео після обробки.");
+        }
+
+        const cidString = typeof blob.ref === 'object' && blob.ref !== null && 'toString' in blob.ref
+            ? blob.ref.toString()
+            : String(blob.ref);
+
+        const available = await this.waitForBlobAvailable(userDid, cidString);
+        if (!available) {
+            throw new Error(
+                `Blob ${cidString} не підтверджено на PDS після очікування. ` +
+                `Схоже на застарілий/непідтверджений blob із попередньої невдалої спроби (video.bsky.app повернув already_exists). ` +
+                `Спробуйте перезавантажити відеофайл заново (наприклад, перекодувавши його), щоб отримати новий хеш і уникнути дедуплікації.`
+            );
+        }
+
+        return {
+            $type: 'blob',
+            ref: blob.ref,
+            mimeType: blob.mimeType || mimeType,
+            size: blob.size
+        };
     }
+
+    const upload = await agent.uploadBlob(buffer, { encoding: mimeType });
+    if (!upload?.data?.blob) {
+        throw new Error("Не вдалося завантажити зображення у Bluesky.");
+    }
+    return upload.data.blob;
+}
 
     async SendBlueSky(content: string, file?: any) {
         await initBlueSky();
