@@ -13,21 +13,6 @@ const agent = new BskyAgent({
 let isBlueSkyLogged = false;
 let loginPromise: Promise<void> | null = null;
 
-async function getPdsHost(did: string): Promise<string> {
-    const res = await agent.com.atproto.repo.describeRepo({ repo: did });
-    const didDoc = res.data.didDoc as any;
-
-    const pdsService = didDoc?.service?.find(
-        (s: any) => s.id === '#atproto_pds' || s.type === 'AtprotoPersonalDataServer'
-    );
-
-    if (!pdsService?.serviceEndpoint) {
-        throw new Error('Не вдалося визначити PDS для акаунта');
-    }
-
-    return new URL(pdsService.serviceEndpoint).host;
-}
-
 async function initBlueSky() {
     if (isBlueSkyLogged) return;
     if (!loginPromise) {
@@ -260,16 +245,15 @@ export default class AdminService {
 
         if (mimeType.startsWith('video/')) {
             const userDid = agent.session!.did;
-            const pdsHost = await getPdsHost(userDid);
 
             const { data: serviceAuth } = await agent.com.atproto.server.getServiceAuth({
-                aud: `did:web:${pdsHost}`,
-                lxm: "com.atproto.repo.uploadBlob",
-                exp: Date.now() / 1000 + 60 * 30,
+                aud: "did:web:video.bsky.app",
+                lxm: "app.bsky.video.uploadVideo",
+                exp: Math.floor(Date.now() / 1000) + 60 * 30,
             });
 
             const uploadUrl = new URL("https://video.bsky.app/xrpc/app.bsky.video.uploadVideo");
-            uploadUrl.searchParams.append("did", agent.session!.did);
+            uploadUrl.searchParams.append("did", userDid);
             uploadUrl.searchParams.append("name", "video.mp4");
 
             const uploadResponse = await fetch(uploadUrl, {
@@ -297,10 +281,10 @@ export default class AdminService {
                     jobId: jobStatus.jobId,
                 });
 
-                if (status.jobStatus.state === 'JOB_STATE_COMPLETED' || status.jobStatus.state === 'completed') {
+                if (status.jobStatus.state === 'JOB_STATE_COMPLETED') {
                     blob = status.jobStatus.blob;
                     break;
-                } else if (status.jobStatus.state === 'JOB_STATE_FAILED' || status.jobStatus.state === 'failed') {
+                } else if (status.jobStatus.state === 'JOB_STATE_FAILED') {
                     throw new Error(`Транскодування відео провалилось: ${status.jobStatus.error || 'невідома помилка'}`);
                 }
             }
