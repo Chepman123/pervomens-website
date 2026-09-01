@@ -54,7 +54,7 @@ export default class AdminService {
     async Send(post: string, file: string, index: number) {
         //const content: string = await this.Translate(post);
 
-       // await this.SendTelegram(post, index, file);
+        //await this.SendTelegram(post, index, file);
         //await this.SendDiscord(content, file);
         //await this.SendBlueSky(content, file);
         await this.SendBlueSky(post, file);
