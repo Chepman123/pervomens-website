@@ -272,7 +272,7 @@ export default class AdminService {
 
 async uploadToBlueSky(fileData: string, mimeType: string) {
     const VIDEO_SERVICE_DID = 'did:web:video.bsky.app';
-    const base64Data = fileData.includes(',') ? fileData.split(',')[1] : fileData;
+const base64Data = fileData.includes(',') ? fileData.split(',')[1] : fileData;
     const buffer = Buffer.from(base64Data, 'base64');
 
     if (mimeType.startsWith('video/')) {
@@ -301,10 +301,10 @@ async uploadToBlueSky(fileData: string, mimeType: string) {
             console.warn("⚠️ Не вдалося перевірити ліміти відео:", limitsErr.message || limitsErr);
         }
 
-        // Токен для uploadVideo — aud = PDS користувача
+        // Токен для uploadVideo — aud = PDS, lxm = com.atproto.repo.uploadBlob (як в оригіналі)
         const { data: uploadAuth } = await agent.com.atproto.server.getServiceAuth({
             aud: `did:web:${pdsHost}`,
-            lxm: "app.bsky.video.uploadVideo",
+            lxm: "com.atproto.repo.uploadBlob",
             exp: Math.floor(Date.now() / 1000) + 60 * 30,
         });
 
