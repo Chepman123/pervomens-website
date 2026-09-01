@@ -277,8 +277,9 @@ async uploadToBlueSky(fileData: string, mimeType: string) {
 
     if (mimeType.startsWith('video/')) {
         const userDid = agent.session!.did;
+        const pdsHost = await getPdsHost(userDid);
 
-        // Токен ТІЛЬКИ для getUploadLimits
+        // Токен для getUploadLimits — aud = video service
         const { data: limitsAuth } = await agent.com.atproto.server.getServiceAuth({
             aud: VIDEO_SERVICE_DID,
             lxm: "app.bsky.video.getUploadLimits",
@@ -292,7 +293,7 @@ async uploadToBlueSky(fileData: string, mimeType: string) {
             const limits = await limitsResponse.json() as any;
             console.log("Ліміти на відеозавантаження:", JSON.stringify(limits));
 
-            if (limits?.canUpload === false && !limits?.error?.includes('invalid_token')) {
+            if (limits?.canUpload === false) {
                 throw new Error(`Досягнуто ліміту на відеозавантаження для акаунта: ${limits.message || 'причина невідома'}`);
             }
         } catch (limitsErr: any) {
@@ -300,8 +301,9 @@ async uploadToBlueSky(fileData: string, mimeType: string) {
             console.warn("⚠️ Не вдалося перевірити ліміти відео:", limitsErr.message || limitsErr);
         }
 
+        // Токен для uploadVideo — aud = PDS користувача
         const { data: uploadAuth } = await agent.com.atproto.server.getServiceAuth({
-            aud: VIDEO_SERVICE_DID,
+            aud: `did:web:${pdsHost}`,
             lxm: "app.bsky.video.uploadVideo",
             exp: Math.floor(Date.now() / 1000) + 60 * 30,
         });
