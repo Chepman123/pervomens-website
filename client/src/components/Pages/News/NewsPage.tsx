@@ -8,11 +8,17 @@ import type Review from '../../../interfaces/Review';
 export default function NewsPage(){
    const {newsId} = useParams<string>();
    const[reviews,setReviews] = useState<Review[]>([]);
+   const[isLogined,setLogined] = useState<boolean>(false);
    async function GetData() {
-      const response = await fetch(`https://pervomens-website-2.onrender.com/News/${newsId}`);
+      let response = await fetch(`https://pervomens-website-2.onrender.com/News/${newsId}`);
       const result = await response.json();
       setReviews(result.reviews);
       setNews(result.news);
+      response = await fetch("https://pervomens-website-2.onrender.com", {
+  method: 'GET',
+  credentials: 'include', 
+});
+if((await response.json()).user) setLogined(true);
    }
    useEffect(()=>{
       GetData();
@@ -50,10 +56,13 @@ export default function NewsPage(){
      </section>
      </div>
      <p className={classes.p}>{news.content}</p>
+     {
+      isLogined&&
      <div className={classes.comment}>
      <input type='text' value={review} onChange={(e)=>{setReview(e.target.value)}} placeholder='comment'/>
      <button onClick={SendReview}>Send</button>
      </div>
+}
      <br/>
      {reviews.map((reviewData)=>{
       return <ReviewCom data={reviewData}/>

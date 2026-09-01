@@ -9,3 +9,8 @@ export default function middleWare(req: Request, res: Response, next: NextFuncti
 
        next();
 }
+export function middleWareIsLogined(req:Request,res:Response,next:NextFunction){
+    if(req.cookies.user.token==null)return;
+
+    next();
+}

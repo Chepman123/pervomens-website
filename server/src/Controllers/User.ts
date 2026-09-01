@@ -9,6 +9,10 @@ export default class Con{
       res.json(await this.service.GetData(req.params.username));
   }
   async SaveProfile(req:Request,res:Response){
+     const token = req.cookies.token;
+    const user = token?(jwt.verify(token, process.env.SECRET!) as {username:string,role:string}):null;
+    if(!user) return;
+    if(user.username!=req.body.username) return;
     this.service.SaveProfile(req.body);
     res.status(200);
     res.json({});

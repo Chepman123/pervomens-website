@@ -8,10 +8,16 @@ export default function Profile(){
     const navigate = useNavigate()
     const {username} = useParams();
     const[editMode,setEditMode] = useState<boolean>(false);
+    const[isUser,setIsUser] = useState<boolean>(false);
     const[user,setUser] = useState<User>({username:username!,description:"",avatar:""});
     async function GetInfo() {
-        const response = await fetch(`https://pervomens-website-2.onrender.com/profile/${username}`);
+        let response = await fetch(`https://pervomens-website-2.onrender.com/profile/${username}`);
         setUser(await response.json())
+         response = await fetch("https://pervomens-website-2.onrender.com", {
+  method: 'GET',
+  credentials: 'include', 
+});
+   if((await response.json()).user.username == username) setIsUser(true);
     }
 
 async function SaveProfile() {
@@ -36,6 +42,7 @@ async function SaveProfile() {
       description: user.description,
       avatar: avatarData?avatarData:user.avatar,
     }),
+    credentials:'include'
   });
 
   setEditMode(false);
@@ -56,7 +63,9 @@ async function SaveProfile() {
             <div className={classes.desc}>
             <h1>{username}</h1>
             <p>{user?.description}</p>
+            { isUser&&
             <button onClick={()=>setEditMode(true)}>Edit profile</button>
+            }
             </div>
         </div>}
         {editMode&&

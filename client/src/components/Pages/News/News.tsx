@@ -5,6 +5,7 @@ import type { newsData } from '../../../data/newsData';
 import { useEffect, useState } from 'react';
 
 export default function News(){
+    
     async function getData(){
       const response = await fetch('https://pervomens-website-2.onrender.com/News');
       setData(await response.json());
