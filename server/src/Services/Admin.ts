@@ -28,6 +28,7 @@ async function initBlueSky() {
     }
     await loginPromise;
 }
+
 async function getPdsHost(did: string): Promise<string> {
     const res = await agent.com.atproto.repo.describeRepo({ repo: did });
     const didDoc = res.data.didDoc as any;
@@ -42,6 +43,7 @@ async function getPdsHost(did: string): Promise<string> {
 
     return new URL(pdsService.serviceEndpoint).host;
 }
+
 export default class AdminService {
 
     async News(content: string, title: string, image: string, game: string) {
@@ -52,8 +54,8 @@ export default class AdminService {
     async Send(post: string, file: string, index: number) {
         const content: string = await this.Translate(post);
 
-        await this.SendTelegram(post, index, file);
-        await this.SendDiscord(content, file);
+      //  await this.SendTelegram(post, index, file);
+        //await this.SendDiscord(content, file);
         await this.SendBlueSky(content, file);
     }
 
@@ -252,11 +254,23 @@ export default class AdminService {
         });
     }
 
- async uploadToBlueSky(fileData: string, mimeType: string) {
+    async waitForBlobAvailable(did: string, cid: string, maxAttempts = 10, delayMs = 2000): Promise<boolean> {
+        for (let i = 0; i < maxAttempts; i++) {
+            try {
+                await agent.com.atproto.sync.getBlob({ did, cid });
+                return true;
+            } catch (err) {
+                console.log(`Blob ще не доступний, спроба ${i + 1}/${maxAttempts}`);
+                await new Promise(r => setTimeout(r, delayMs));
+            }
+        }
+        return false;
+    }
+
+    async uploadToBlueSky(fileData: string, mimeType: string) {
         const base64Data = fileData.includes(',') ? fileData.split(',')[1] : fileData;
         const buffer = Buffer.from(base64Data, 'base64');
 
-        // Handle videos using the dedicated Bluesky video service pipeline
         if (mimeType.startsWith('video/')) {
             const userDid = agent.session!.did;
             const pdsHost = await getPdsHost(userDid);
@@ -290,7 +304,6 @@ export default class AdminService {
             const videoAgent = new BskyAgent({ service: "https://video.bsky.app" });
             let blob = jobStatus.blob;
 
-            // Poll until video transcoding is complete
             while (!blob && jobStatus.jobId) {
                 await new Promise(r => setTimeout(r, 3000));
                 const { data: status } = await videoAgent.app.bsky.video.getJobStatus({
@@ -309,8 +322,14 @@ export default class AdminService {
                 throw new Error("Не вдалося отримати blob відео після обробки.");
             }
 
-            // 🛑 Штучна затримка на 3-4 секунди, щоб PDS встиг зарезервувати/синхронізувати blob
-            await new Promise(r => setTimeout(r, 4000));
+            const cidString = typeof blob.ref === 'object' && blob.ref !== null && 'toString' in blob.ref
+                ? blob.ref.toString()
+                : String(blob.ref);
+
+            const available = await this.waitForBlobAvailable(userDid, cidString);
+            if (!available) {
+                console.warn("⚠️ Не вдалося підтвердити доступність blob, продовжую спробу без підтвердження...");
+            }
 
             return {
                 $type: 'blob',
@@ -318,16 +337,14 @@ export default class AdminService {
                 mimeType: blob.mimeType || mimeType,
                 size: blob.size
             };
-        } 
-        
-        // Handle standard images (JPEG, PNG, etc.)
+        }
+
         const upload = await agent.uploadBlob(buffer, { encoding: mimeType });
         if (!upload?.data?.blob) {
             throw new Error("Не вдалося завантажити зображення у Bluesky.");
         }
         return upload.data.blob;
     }
-
 
     async SendBlueSky(content: string, file?: any) {
         await initBlueSky();
@@ -347,15 +364,31 @@ export default class AdminService {
                 const mediaBlob = await this.uploadToBlueSky(fileString, mimeType);
 
                 if (mimeType.startsWith('video/')) {
-                    console.log("Відправка поста з відео...");
-                    await agent.post({
-                        text: content,
-                        embed: {
-                            $type: "app.bsky.embed.video",
-                            video: mediaBlob,
-                            alt: content
+                    let attempts = 0;
+                    let posted = false;
+                    while (attempts < 3 && !posted) {
+                        try {
+                            console.log("Відправка поста з відео...");
+                            await agent.post({
+                                text: content,
+                                embed: {
+                                    $type: "app.bsky.embed.video",
+                                    video: mediaBlob,
+                                    alt: content
+                                }
+                            });
+                            posted = true;
+                        } catch (postErr: any) {
+                            attempts++;
+                            const msg = postErr?.message || '';
+                            if (msg.includes('Could not find blob') && attempts < 3) {
+                                console.log(`Blob ще не проіндексовано, повтор ${attempts}/3...`);
+                                await new Promise(r => setTimeout(r, 3000 * attempts));
+                            } else {
+                                throw postErr;
+                            }
                         }
-                    });
+                    }
                 } else {
                     console.log("Відправка поста з картинкою...");
                     await agent.post({
