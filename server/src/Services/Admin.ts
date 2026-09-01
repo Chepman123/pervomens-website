@@ -52,11 +52,12 @@ export default class AdminService {
     }
 
     async Send(post: string, file: string, index: number) {
-        const content: string = await this.Translate(post);
+       // const content: string = await this.Translate(post);
 
-      //  await this.SendTelegram(post, index, file);
+        //await this.SendTelegram(post, index, file);
         //await this.SendDiscord(content, file);
-        await this.SendBlueSky(content, file);
+        //await this.SendBlueSky(content, file);
+        await this.SendBlueSky(post, file);
     }
 
     async SendTelegram(content: string, index: number, file?: string) {
@@ -283,7 +284,7 @@ export default class AdminService {
 
             const uploadUrl = new URL("https://video.bsky.app/xrpc/app.bsky.video.uploadVideo");
             uploadUrl.searchParams.append("did", userDid);
-            uploadUrl.searchParams.append("name", "video.mp4");
+            uploadUrl.searchParams.append("name", `video_${Date.now()}.mp4`);
 
             const uploadResponse = await fetch(uploadUrl, {
                 method: "POST",
@@ -296,9 +297,14 @@ export default class AdminService {
             });
 
             const jobStatus = await uploadResponse.json() as any;
+            console.log("Відповідь uploadVideo:", JSON.stringify(jobStatus));
 
             if (!uploadResponse.ok && jobStatus.error !== 'already_exists') {
                 throw new Error(`Помилка завантаження відео: ${JSON.stringify(jobStatus)}`);
+            }
+
+            if (jobStatus.error === 'already_exists') {
+                console.warn("⚠️ video.bsky.app повернув already_exists — можливо застарілий/непідтверджений blob із попередньої спроби.");
             }
 
             const videoAgent = new BskyAgent({ service: "https://video.bsky.app" });
@@ -328,7 +334,11 @@ export default class AdminService {
 
             const available = await this.waitForBlobAvailable(userDid, cidString);
             if (!available) {
-                console.warn("⚠️ Не вдалося підтвердити доступність blob, продовжую спробу без підтвердження...");
+                throw new Error(
+                    `Blob ${cidString} не підтверджено на PDS після очікування. ` +
+                    `Схоже на застарілий/непідтверджений blob із попередньої невдалої спроби (video.bsky.app повернув already_exists). ` +
+                    `Спробуйте перезавантажити відеофайл заново (наприклад, перекодувавши його), щоб отримати новий хеш і уникнути дедуплікації.`
+                );
             }
 
             return {
