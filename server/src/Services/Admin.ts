@@ -52,9 +52,9 @@ export default class AdminService {
     }
 
     async Send(post: string, file: string, index: number) {
-       // const content: string = await this.Translate(post);
+        //const content: string = await this.Translate(post);
 
-        //await this.SendTelegram(post, index, file);
+       // await this.SendTelegram(post, index, file);
         //await this.SendDiscord(content, file);
         //await this.SendBlueSky(content, file);
         await this.SendBlueSky(post, file);
@@ -281,6 +281,21 @@ export default class AdminService {
                 lxm: "com.atproto.repo.uploadBlob",
                 exp: Math.floor(Date.now() / 1000) + 60 * 30,
             });
+
+            try {
+                const limitsResponse = await fetch("https://video.bsky.app/xrpc/app.bsky.video.getUploadLimits", {
+                    headers: { Authorization: `Bearer ${serviceAuth.token}` }
+                });
+                const limits = await limitsResponse.json() as any;
+                console.log("Ліміти на відеозавантаження:", JSON.stringify(limits));
+
+                if (limits?.canUpload === false) {
+                    throw new Error(`Досягнуто ліміту на відеозавантаження для акаунта: ${limits.message || 'причина невідома'}`);
+                }
+            } catch (limitsErr: any) {
+                if (limitsErr.message?.startsWith('Досягнуто ліміту')) throw limitsErr;
+                console.warn("⚠️ Не вдалося перевірити ліміти відео:", limitsErr.message || limitsErr);
+            }
 
             const uploadUrl = new URL("https://video.bsky.app/xrpc/app.bsky.video.uploadVideo");
             uploadUrl.searchParams.append("did", userDid);
