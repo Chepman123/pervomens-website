@@ -28,7 +28,20 @@ async function initBlueSky() {
     }
     await loginPromise;
 }
+async function getPdsHost(did: string): Promise<string> {
+    const res = await agent.com.atproto.repo.describeRepo({ repo: did });
+    const didDoc = res.data.didDoc as any;
 
+    const pdsService = didDoc?.service?.find(
+        (s: any) => s.id === '#atproto_pds' || s.type === 'AtprotoPersonalDataServer'
+    );
+
+    if (!pdsService?.serviceEndpoint) {
+        throw new Error('Не вдалося визначити PDS для акаунта');
+    }
+
+    return new URL(pdsService.serviceEndpoint).host;
+}
 export default class AdminService {
 
     async News(content: string, title: string, image: string, game: string) {
@@ -240,65 +253,67 @@ export default class AdminService {
     }
 
     async uploadToBlueSky(fileData: string, mimeType: string) {
-        const base64Data = fileData.includes(',') ? fileData.split(',')[1] : fileData;
-        const buffer = Buffer.from(base64Data, 'base64');
+    const base64Data = fileData.includes(',') ? fileData.split(',')[1] : fileData;
+    const buffer = Buffer.from(base64Data, 'base64');
 
-        if (mimeType.startsWith('video/')) {
-            const userDid = agent.session!.did;
+    if (mimeType.startsWith('video/')) {
+        const userDid = agent.session!.did;
+        const pdsHost = await getPdsHost(userDid);
 
-            const { data: serviceAuth } = await agent.com.atproto.server.getServiceAuth({
-                aud: "did:web:video.bsky.app",
-                lxm: "app.bsky.video.uploadVideo",
-                exp: Math.floor(Date.now() / 1000) + 60 * 30,
-            });
+        const { data: serviceAuth } = await agent.com.atproto.server.getServiceAuth({
+            aud: `did:web:${pdsHost}`,
+            lxm: "com.atproto.repo.uploadBlob",
+            exp: Math.floor(Date.now() / 1000) + 60 * 30,
+        });
 
-            const uploadUrl = new URL("https://video.bsky.app/xrpc/app.bsky.video.uploadVideo");
-            uploadUrl.searchParams.append("did", userDid);
-            uploadUrl.searchParams.append("name", "video.mp4");
+        const uploadUrl = new URL("https://video.bsky.app/xrpc/app.bsky.video.uploadVideo");
+        uploadUrl.searchParams.append("did", userDid);
+        uploadUrl.searchParams.append("name", "video.mp4");
 
-            const uploadResponse = await fetch(uploadUrl, {
-                method: "POST",
-                headers: {
-                    Authorization: `Bearer ${serviceAuth.token}`,
-                    "Content-Type": mimeType,
-                    "Content-Length": String(buffer.length),
-                },
-                body: buffer,
-            });
+        const uploadResponse = await fetch(uploadUrl, {
+            method: "POST",
+            headers: {
+                Authorization: `Bearer ${serviceAuth.token}`,
+                "Content-Type": mimeType,
+                "Content-Length": String(buffer.length),
+            },
+            body: buffer,
+        });
 
-            const jobStatus = await uploadResponse.json() as any;
+        const jobStatus = await uploadResponse.json() as any;
 
-            if (!uploadResponse.ok && jobStatus.error !== 'already_exists') {
-                throw new Error(`Помилка завантаження відео: ${JSON.stringify(jobStatus)}`);
-            }
-
-            const videoAgent = new BskyAgent({ service: "https://video.bsky.app" });
-            let blob = jobStatus.blob;
-
-            while (!blob && jobStatus.jobId) {
-                await new Promise(r => setTimeout(r, 3000));
-                const { data: status } = await videoAgent.app.bsky.video.getJobStatus({
-                    jobId: jobStatus.jobId,
-                });
-
-                if (status.jobStatus.state === 'JOB_STATE_COMPLETED') {
-                    blob = status.jobStatus.blob;
-                    break;
-                } else if (status.jobStatus.state === 'JOB_STATE_FAILED') {
-                    throw new Error(`Транскодування відео провалилось: ${status.jobStatus.error || 'невідома помилка'}`);
-                }
-            }
-
-            if (!blob) {
-                throw new Error("Не вдалося отримати blob відео після обробки.");
-            }
-
-            return blob;
-        } else {
-            const upload = await agent.uploadBlob(buffer, { encoding: mimeType });
-            return upload.data.blob;
+        if (!uploadResponse.ok && jobStatus.error !== 'already_exists') {
+            throw new Error(`Помилка завантаження відео: ${JSON.stringify(jobStatus)}`);
         }
+
+        const videoAgent = new BskyAgent({ service: "https://video.bsky.app" });
+        let blob = jobStatus.blob;
+
+        while (!blob && jobStatus.jobId) {
+            await new Promise(r => setTimeout(r, 3000));
+            const { data: status } = await videoAgent.app.bsky.video.getJobStatus({
+                jobId: jobStatus.jobId,
+            });
+
+            if (status.jobStatus.state === 'JOB_STATE_COMPLETED') {
+                blob = status.jobStatus.blob;
+                break;
+            } else if (status.jobStatus.state === 'JOB_STATE_FAILED') {
+                throw new Error(`Транскодування відео провалилось: ${status.jobStatus.error || 'невідома помилка'}`);
+            }
+        }
+
+        if (!blob) {
+            throw new Error("Не вдалося отримати blob відео після обробки.");
+        }
+
+        return blob;
+    } else {
+        const upload = await agent.uploadBlob(buffer, { encoding: mimeType });
+        return upload.data.blob;
     }
+}
+
 
     async SendBlueSky(content: string, file?: any) {
         await initBlueSky();
