@@ -6,6 +6,41 @@ import axios from 'axios';
 import FormData from 'form-data';
 import path from 'path';
 import GameData from "../Interfaces/GameData";
+import ffmpeg from 'fluent-ffmpeg';
+import ffmpegPath from 'ffmpeg-static';
+import * as os from 'os';
+import { randomUUID } from 'crypto';
+
+if (ffmpegPath) {
+    ffmpeg.setFfmpegPath(ffmpegPath);
+}
+
+async function makeVideoUnique(buffer: Buffer): Promise<Buffer> {
+    const tmpDir = os.tmpdir();
+    const inputPath = path.join(tmpDir, `in_${Date.now()}_${randomUUID()}.mp4`);
+    const outputPath = path.join(tmpDir, `out_${Date.now()}_${randomUUID()}.mp4`);
+
+    fs.writeFileSync(inputPath, buffer);
+
+    await new Promise<void>((resolve, reject) => {
+        ffmpeg(inputPath)
+            .outputOptions([
+                '-c copy',
+                `-metadata comment=uid_${randomUUID()}`,
+                '-movflags +faststart'
+            ])
+            .save(outputPath)
+            .on('end', () => resolve())
+            .on('error', (err) => reject(err));
+    });
+
+    const result = fs.readFileSync(outputPath);
+
+    fs.unlink(inputPath, () => {});
+    fs.unlink(outputPath, () => {});
+
+    return Buffer.from(result); // нормалізує тип Buffer
+}
 
 const agent = new BskyAgent({
     service: "https://bsky.social"
@@ -271,11 +306,19 @@ export default class AdminService {
     
 
 async uploadToBlueSky(fileData: string, mimeType: string) {
-    const VIDEO_SERVICE_DID = 'did:web:video.bsky.app';
-const base64Data = fileData.includes(',') ? fileData.split(',')[1] : fileData;
-    const buffer = Buffer.from(base64Data, 'base64');
+       const VIDEO_SERVICE_DID = 'did:web:video.bsky.app';
+    const base64Data = fileData.includes(',') ? fileData.split(',')[1] : fileData;
+    let buffer: Buffer = Buffer.from(base64Data, 'base64');  // ← явна анотація типу
 
     if (mimeType.startsWith('video/')) {
+        try {
+            buffer = await makeVideoUnique(buffer);  // тепер каст не потрібен взагалі
+            console.log("✅ Відео ремуксовано з унікальним метаданим (новий хеш)");
+        } catch (remuxErr: any) {
+            console.warn("⚠️ Не вдалося зробити відео унікальним, продовжую з оригіналом:", remuxErr.message || remuxErr);
+        }
+
+
         const userDid = agent.session!.did;
         const pdsHost = await getPdsHost(userDid);
 
@@ -301,7 +344,7 @@ const base64Data = fileData.includes(',') ? fileData.split(',')[1] : fileData;
             console.warn("⚠️ Не вдалося перевірити ліміти відео:", limitsErr.message || limitsErr);
         }
 
-        // Токен для uploadVideo — aud = PDS, lxm = com.atproto.repo.uploadBlob (як в оригіналі)
+        // Токен для uploadVideo — aud = PDS, lxm = com.atproto.repo.uploadBlob
         const { data: uploadAuth } = await agent.com.atproto.server.getServiceAuth({
             aud: `did:web:${pdsHost}`,
             lxm: "com.atproto.repo.uploadBlob",
@@ -313,14 +356,14 @@ const base64Data = fileData.includes(',') ? fileData.split(',')[1] : fileData;
         uploadUrl.searchParams.append("name", `video_${Date.now()}.mp4`);
 
         const uploadResponse = await fetch(uploadUrl, {
-            method: "POST",
-            headers: {
-                Authorization: `Bearer ${uploadAuth.token}`,
-                "Content-Type": mimeType,
-                "Content-Length": String(buffer.length),
-            },
-            body: buffer,
-        });
+    method: "POST",
+    headers: {
+        Authorization: `Bearer ${uploadAuth.token}`,
+        "Content-Type": mimeType,
+        "Content-Length": String(buffer.length),
+    },
+    body: new Uint8Array(buffer),
+});
 
         const jobStatus = await uploadResponse.json() as any;
         console.log("Відповідь uploadVideo:", JSON.stringify(jobStatus));
