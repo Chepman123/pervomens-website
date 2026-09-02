@@ -25,21 +25,26 @@ async function makeVideoUnique(buffer: Buffer): Promise<Buffer> {
     await new Promise<void>((resolve, reject) => {
         ffmpeg(inputPath)
             .outputOptions([
-                '-c copy',
-                `-metadata comment=uid_${randomUUID()}`,
-                '-movflags +faststart'
+                '-c:v', 'copy',
+                '-c:a', 'copy',
+                '-map_metadata', '-1',
+                '-movflags', '+faststart'
             ])
             .save(outputPath)
             .on('end', () => resolve())
             .on('error', (err) => reject(err));
     });
 
-    const result = fs.readFileSync(outputPath);
+    let result = fs.readFileSync(outputPath);
+
+    // Гарантовано міняємо байти файлу, не покладаючись на ffmpeg-метадані
+    const uniqueMarker = Buffer.from(`\n<!--uid:${randomUUID()}-->`, 'utf-8');
+    result = Buffer.concat([result, uniqueMarker]);
 
     fs.unlink(inputPath, () => {});
     fs.unlink(outputPath, () => {});
 
-    return Buffer.from(result); // нормалізує тип Buffer
+    return result;
 }
 
 const agent = new BskyAgent({
