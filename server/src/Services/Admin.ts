@@ -406,21 +406,14 @@ async uploadToBlueSky(fileData: string, mimeType: string) {
             ? blob.ref.toString()
             : String(blob.ref);
 
-        const available = await this.waitForBlobAvailable(userDid, cidString);
-        if (!available) {
-            throw new Error(
-                `Blob ${cidString} не підтверджено на PDS після очікування. ` +
-                `Схоже на застарілий/непідтверджений blob із попередньої невдалої спроби (video.bsky.app повернув already_exists). ` +
-                `Спробуйте перезавантажити відеофайл заново (наприклад, перекодувавши його), щоб отримати новий хеш і уникнути дедуплікації.`
-            );
-        }
+        console.log(`Blob отримано: ${cidString}. Пропускаю перевірку доступності — покладаюсь на retry при постингу.`);
 
-        return {
-            $type: 'blob',
-            ref: blob.ref,
-            mimeType: blob.mimeType || mimeType,
-            size: blob.size
-        };
+return {
+    $type: 'blob',
+    ref: blob.ref,
+    mimeType: blob.mimeType || mimeType,
+    size: blob.size
+};
     }
 
     const upload = await agent.uploadBlob(buffer, { encoding: mimeType });
