@@ -1,11 +1,19 @@
 import db from "../db";
-import bcrypt from 'bcrypt';
-import { RegLogResult } from "../Interfaces/LogReg";
-import jwt from "jsonwebtoken";
+//#region cash
+let timeCreated:number;
+let timeLife = 1000*6*15;
+let cash:any;
+
+let lastcash:any;
+let timeCreatedLast:number;
+//#endregion
 export default class NewsService{
      async GetNews(){
+        if(cash!=null && new Date().getTime()-timeCreated!<timeLife)return cash;
         const sql:string = "SELECT * FROM news ORDER BY createdat DESC";
         const result = (await db.query(sql)).rows;
+        cash = result;
+        timeCreated=new Date().getTime();
         return result;
     }
     
@@ -30,8 +38,10 @@ export default class NewsService{
         db.query(sql,[id]);
     }
     async GetLastNews(){
+        if(lastcash!=null && new Date().getTime()-timeCreatedLast!<timeLife)return lastcash;
         const sql:string = "SELECT * FROM news ORDER BY createdat DESC LIMIT 5";
         const result = (await db.query(sql)).rows;
+        lastcash = result;
         return result;
     }
    
