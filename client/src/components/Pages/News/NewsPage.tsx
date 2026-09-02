@@ -5,10 +5,12 @@ import classes from './News.module.scss';
 import { useEffect, useState } from 'react';
 import type{ newsData } from '../../../data/newsData';
 import type Review from '../../../interfaces/Review';
+import Loading from '../../Loading/Loading';
 export default function NewsPage(){
    const {newsId} = useParams<string>();
    const[reviews,setReviews] = useState<Review[]>([]);
    const[isLogined,setLogined] = useState<boolean>(false);
+   const[loading,setLoading] = useState<boolean>(true);
    async function GetData() {
       let response = await fetch(`https://pervomens-website-2.onrender.com/News/${newsId}`);
       const result = await response.json();
@@ -19,6 +21,8 @@ export default function NewsPage(){
   credentials: 'include', 
 });
 if((await response.json()).user) setLogined(true);
+
+setLoading(false);
    }
    useEffect(()=>{
       GetData();
@@ -44,6 +48,7 @@ if((await response.json()).user) setLogined(true);
    const[review,setReview] = useState<string>();
     return (
      <article className={classes.article}>
+      <Loading display={loading}/>
         <div className={classes.div}>
      <img className={classes.img} src={news.image}/>
      <section className={classes.section}> 
